@@ -1,0 +1,579 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+   <meta charset="UTF-8">
+   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+   <title>أرشفة وضغط الملفات - منهج سيسكو NDG Linux</title>
+   <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@500;700;900&family=Fira+Code:wght@500;700&display=swap" rel="stylesheet">
+   <style>
+       :root {
+           --bg-page: #f1f5f9;
+           --card-bg: #ffffff;
+           --primary-blue: #0284c7;
+           --dark-blue: #0f172a;
+           --accent-green: #16a34a;
+           --accent-orange: #ea580c;
+           --text-main: #0f172a;
+           --text-muted: #475569;
+           --border-color: #94a3b8;
+       }
+
+       * {
+           box-sizing: border-box;
+           margin: 0;
+           padding: 0;
+           font-family: 'Tajawal', sans-serif;
+       }
+
+       body {
+           background-color: var(--bg-page);
+           color: var(--text-main);
+           overflow-x: hidden;
+           padding: 15px;
+       }
+
+       .presentation-container {
+           max-width: 1300px;
+           margin: 0 auto;
+           padding: 10px;
+       }
+
+       .slide {
+           display: none;
+           background: var(--card-bg);
+           border: 3px solid var(--border-color);
+           border-radius: 20px;
+           padding: 40px;
+           min-height: 750px;
+           box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+           position: relative;
+       }
+
+       .slide.active {
+           display: flex;
+           flex-direction: column;
+           justify-content: space-between;
+       }
+
+       .slide-header {
+           border-bottom: 4px solid var(--primary-blue);
+           padding-bottom: 15px;
+           margin-bottom: 25px;
+           display: flex;
+           justify-content: space-between;
+           align-items: center;
+       }
+
+       .slide-header h2 {
+           font-size: 2.2rem;
+           color: var(--dark-blue);
+           font-weight: 900;
+       }
+
+       .slide-number {
+           font-family: 'Fira Code', monospace;
+           background: #e0f2fe;
+           color: var(--primary-blue);
+           padding: 8px 18px;
+           border-radius: 25px;
+           font-size: 1.2rem;
+           font-weight: bold;
+           border: 2px solid #38bdf8;
+       }
+
+       .slide-body {
+           flex-grow: 1;
+           font-size: 1.2rem;
+           line-height: 1.8;
+       }
+
+       .nav-controls {
+           display: flex;
+           justify-content: space-between;
+           margin-top: 30px;
+           border-top: 3px solid #cbd5e1;
+           padding-top: 20px;
+       }
+
+       button.nav-btn {
+           background: var(--dark-blue);
+           border: none;
+           color: white;
+           padding: 14px 35px;
+           border-radius: 10px;
+           cursor: pointer;
+           font-weight: 900;
+           font-size: 1.25rem;
+           transition: 0.2s;
+       }
+
+       button.nav-btn:hover {
+           background: var(--primary-blue);
+           box-shadow: 0 6px 20px rgba(2, 132, 199, 0.4);
+       }
+
+       .grid-2 {
+           display: grid;
+           grid-template-columns: 1fr 1fr;
+           gap: 25px;
+           margin-top: 15px;
+       }
+
+       .box {
+           background: #f8fafc;
+           border: 2px solid var(--border-color);
+           padding: 20px;
+           border-radius: 14px;
+           border-right: 8px solid var(--primary-blue);
+       }
+
+       .box h3 {
+           color: var(--dark-blue);
+           margin-bottom: 10px;
+           font-size: 1.35rem;
+           font-weight: 900;
+       }
+
+       .terminal-window {
+           background: #0f172a;
+           border-radius: 12px;
+           margin: 12px 0;
+           overflow: hidden;
+           box-shadow: 0 6px 20px rgba(0,0,0,0.25);
+           direction: ltr;
+           text-align: left;
+           border: 2px solid #334155;
+       }
+
+       .terminal-header {
+           background: #1e293b;
+           padding: 8px 12px;
+           display: flex;
+           gap: 8px;
+       }
+
+       .t-dot {
+           width: 12px;
+           height: 12px;
+           border-radius: 50%;
+       }
+
+       .terminal-body {
+           padding: 18px;
+           font-family: 'Fira Code', monospace;
+           font-size: 1.05rem;
+           color: #f8fafc;
+           line-height: 1.7;
+       }
+
+       .t-prompt { color: #38bdf8; font-weight: bold; }
+       .t-cmd { color: #4ade80; font-weight: bold; }
+       .t-output { color: #e2e8f0; }
+
+       .quiz-box {
+           background: #fdf4ff;
+           border: 2px solid #e879f9;
+           padding: 18px;
+           border-radius: 14px;
+           margin-top: 12px;
+       }
+
+       .quiz-options {
+           display: flex;
+           flex-direction: column;
+           gap: 10px;
+           margin-top: 10px;
+       }
+
+       .quiz-options button {
+           display: block;
+           width: 100%;
+           background: white;
+           color: var(--dark-blue);
+           border: 2px solid #cbd5e1;
+           padding: 10px 15px;
+           border-radius: 8px;
+           cursor: pointer;
+           text-align: right;
+           font-size: 1.1rem;
+           font-weight: 700;
+           transition: 0.2s;
+       }
+
+       .quiz-options button:hover {
+           background: #f3e8ff;
+           border-color: #c084fc;
+       }
+
+       ul { padding-right: 25px; }
+       li { margin-bottom: 6px; }
+   </style>
+</head>
+<body>
+
+<div class="presentation-container">
+
+   <!-- الشريحة 1: الغلاف -->
+   <div class="slide active" id="slide-1">
+       <div class="slide-header">
+           <h2>الكلية التقنية للبنات بشقراء</h2>
+           <span class="slide-number">01 / 12</span>
+       </div>
+       <div class="slide-body" style="display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center;">
+           <h1 style="font-size: 3.2rem; color: var(--dark-blue); margin-bottom: 20px;">أرشفة الملفات وضغطها في لينكس</h1>
+           <p style="font-size: 1.6rem; color: var(--text-muted);">مقرر نظم تشغيل 2 - منهج سيسكو (NDG Linux / Cisco Networking Academy)</p>
+           <div style="margin-top: 35px; font-family: 'Fira Code', monospace; color: var(--primary-blue); background: #e0f2fe; padding: 12px 30px; border-radius: 10px; font-weight: bold; font-size: 1.3rem;">
+               إعداد المدربة: الهنوف الشعلان
+           </div>
+       </div>
+       <div class="nav-controls">
+           <span></span>
+           <button class="nav-btn" onclick="nextSlide()">التالي ←</button>
+       </div>
+   </div>
+
+   <!-- الشريحة 2: الأرشفة مقابل الضغط -->
+   <div class="slide" id="slide-2">
+       <div class="slide-header">
+           <h2>الأرشفة مقابل الضغط (Archiving vs Compression)</h2>
+           <span class="slide-number">02 / 12</span>
+       </div>
+       <div class="slide-body">
+           <div class="grid-2">
+               <div class="box">
+                   <h3>📦 الأرشفة (Archiving)</h3>
+                   <p>• جمع ملفات متعددة لتصبح واحدًا (ملفات قليلة أو مجلدات متعددة).</p>
+                   <p>• تجمع المجلدات وتسهل نقلها كحاوية واحدة مع الحفاظ على البنية.</p>
+               </div>
+               <div class="box" style="border-right-color: var(--accent-orange);">
+                   <h3>🗜️ الضغط (Compression)</h3>
+                   <p>• جعل حجم الملف أصغر عبر حذف المعلومات المتكررة واستبدالها بكود أصغر.</p>
+                   <p>• يمكن أن يُطبق على الملفات الفردية، مجموعة ملفات، أو المجلد الحالي بكافة تفرعاته.</p>
+               </div>
+           </div>
+           <div style="margin-top: 15px; font-size: 1.1rem; background: #e2e8f0; padding: 12px; border-radius: 8px;">
+               💡 <strong>ملاحظة هامة:</strong> ضغط ملف مضغوط <u>لن</u> يجعله أصغر مرّة أخرى (لأن التكرارات تمت إزالتها مسبقاً).
+           </div>
+       </div>
+       <div class="nav-controls">
+           <button class="nav-btn" onclick="prevSlide()">→ السابق</button>
+           <button class="nav-btn" onclick="nextSlide()">التالي ←</button>
+       </div>
+   </div>
+
+   <!-- الشريحة 3: استخدام الأرشفة والضغط -->
+   <div class="slide" id="slide-3">
+       <div class="slide-header">
+           <h2>استخدام الأرشفة والضغط (Uses)</h2>
+           <span class="slide-number">03 / 12</span>
+       </div>
+       <div class="slide-body">
+           <ul style="line-height: 1.9; font-size: 1.2rem;">
+               <li><strong>مشاركة مجموعة ملفات:</strong> عند توفير عدد كبير من الملفات (مثل كود المصدر والمستندات)، من الأسهل تنزيل أرشيف مضغوط بدلاً من ملفات فرعية متفرقة.</li>
+               <li><strong>إدارة سجل الملفات (Log Management):</strong> ملفات السجل عادة تملأ مساحة القرص، لذا يُفضل ضغط الإصدارات القديمة منها.</li>
+               <li><strong>الضغط لكفاءة نقل أعلى:</strong> الملفات المضغوطة أسرع في إرسالها عبر شبكة بطيئة مقارنة بالملفات غير المضغوطة.</li>
+               <li><strong>إبقاء الملفات مجمعة معاً حسب الوقت:</strong> عند النسخ الاحتياطي للمجلدات، من الأسهل حفظها في أرشيف واحد.</li>
+           </ul>
+       </div>
+       <div class="nav-controls">
+           <button class="nav-btn" onclick="prevSlide()">→ السابق</button>
+           <button class="nav-btn" onclick="nextSlide()">التالي ←</button>
+       </div>
+   </div>
+
+   <!-- الشريحة 4: ضغط Lossless و Lossy -->
+   <div class="slide" id="slide-4">
+       <div class="slide-header">
+           <h2>ضغط Lossless و Lossy</h2>
+           <span class="slide-number">04 / 12</span>
+       </div>
+       <div class="slide-body">
+           <div class="grid-2">
+               <div class="box">
+                   <h3>Lossless (بدون فقدان)</h3>
+                   <p>• لا معلومات تُحذف من الملف الأصل.</p>
+                   <p>• الملف الناتج عن فك الضغط هو نفس الملف الأصلي تماماً.</p>
+                   <p>• يُستخدم للسجلات، المستندات، والتكوين (Configs).</p>
+               </div>
+               <div class="box" style="border-right-color: var(--accent-orange);">
+                   <h3>Lossy (مع فقدان)</h3>
+                   <p>• قد تحذف معلومات من الملف الأصل.</p>
+                   <p>• الملف الناتج عن فك الضغط قد يختلف عن الملف الأصلي.</p>
+                   <p>• يُستخدم للصور، الصوت، والأفلام لجعلها مضغوطة بشكل أفضل.</p>
+               </div>
+           </div>
+       </div>
+       <div class="nav-controls">
+           <button class="nav-btn" onclick="prevSlide()">→ السابق</button>
+           <button class="nav-btn" onclick="nextSlide()">التالي ←</button>
+       </div>
+   </div>
+
+   <!-- الشريحة 5: مقارنة gzip و bzip2 -->
+   <div class="slide" id="slide-5">
+       <div class="slide-header">
+           <h2>أدوات الضغط: gzip و bzip2</h2>
+           <span class="slide-number">05 / 12</span>
+       </div>
+       <div class="slide-body">
+           <p style="margin-bottom: 12px;">هناك زوج آخر من الأوامر يعمل بشكل شبيه: <code>gzip / gunzip</code> و <code>bzip2 / bunzip2</code>:</p>
+           <div class="grid-2">
+               <div class="box">
+                   <h3>gzip و gunzip</h3>
+                   <p>• ضغط Lossless، كفاءة جيدة وسريعة.</p>
+                   <p>• امتداد ملفاته: <code>.gz</code>.</p>
+               </div>
+               <div class="box" style="border-right-color: var(--accent-orange);">
+                   <h3>bzip2 و bunzip2</h3>
+                   <p>• ضغط Lossless، أكثر فعالية قليلاً من gzip، ولكنه يتطلب المزيد من وقت ووحدة المعالجة المركزية (CPU).</p>
+                   <p>• امتداد ملفاته: <code>.bz2</code>.</p>
+               </div>
+           </div>
+       </div>
+       <div class="nav-controls">
+           <button class="nav-btn" onclick="prevSlide()">→ السابق</button>
+           <button class="nav-btn" onclick="nextSlide()">التالي ←</button>
+       </div>
+   </div>
+
+   <!-- الشريحة 6: مثال ضغط ملف Book -->
+   <div class="slide" id="slide-6">
+       <div class="slide-header">
+           <h2>مثال لضغط ملف اسمه Book</h2>
+           <span class="slide-number">06 / 12</span>
+       </div>
+       <div class="slide-body">
+           <div class="terminal-window">
+               <div class="terminal-header"><div class="t-dot" style="background:#ef4444;"></div><div class="t-dot" style="background:#f59e0b;"></div><div class="t-dot" style="background:#22c55e;"></div></div>
+               <div class="terminal-body">
+                   <span class="t-prompt">sh@ubuntu:~$</span> <span class="t-cmd">ls -l Book</span><br>
+                   <span class="t-output">-rw-r--r-- 1 admin admin 372063 Oct 11 21:24 Book</span><br>
+                   <span class="t-prompt">sh@ubuntu:~$</span> <span class="t-cmd">gzip Book</span> <span style="color:#94a3b8"># ضغط ملف</span><br>
+                   <span class="t-prompt">sh@ubuntu:~$</span> <span class="t-cmd">ls -l Book</span><br>
+                   <span class="t-output">-rw-r--r-- 1 admin admin 26080 Oct 11 21:24 Book.gz</span><br>
+                   <span class="t-prompt">sh@ubuntu:~$</span> <span class="t-cmd">gzip -l Book.gz</span> <span style="color:#94a3b8"># عرض تفاصيل الملف المضغوط</span><br>
+                   <span class="t-output">
+                   compressed   uncompressed  ratio  uncompressed_name<br>
+                   26080        372063        93.0%  Book
+                   </span>
+               </div>
+           </div>
+           <p style="font-size: 1.05rem; margin-top: 5px;"><strong>لفك الضغط:</strong> استخدام الأمر <code>gunzip Book.gz</code> أو الأمر المكافئ <code>gzip -d Book.gz</code>.</p>
+       </div>
+       <div class="nav-controls">
+           <button class="nav-btn" onclick="prevSlide()">→ السابق</button>
+           <button class="nav-btn" onclick="nextSlide()">التالي ←</button>
+       </div>
+   </div>
+
+   <!-- الشريحة 7: الأرشفة باستخدام tar -->
+   <div class="slide" id="slide-7">
+       <div class="slide-header">
+           <h2>الأرشفة باستخدام أداة tar</h2>
+           <span class="slide-number">07 / 12</span>
+       </div>
+       <div class="slide-body">
+           <p>• <strong>Tar</strong> اختصار (Tape aRchive) وهي أداة يونيكس التقليدية لأرشفة الملفات.</p>
+           <p style="margin-top: 8px;">• يمتلك tar ثلاثة أساليب رئيسية:</p>
+           <ul style="margin-top: 5px;">
+               <li><strong>Create (إنشاء):</strong> إنشاء أرشيف جديد من سلسلة ملفات.</li>
+               <li><strong>Extract (استخراج):</strong> سحب ملف واحد أو أكثر من الأرشيف.</li>
+               <li><strong>List (عرض):</strong> عرض محتويات الأرشيف بدون استخراج.</li>
+           </ul>
+           <p style="margin-top: 10px;">• تم الاتفاق على استخدام الامتداد <code>.tar</code> لملفات الـ tar، والإمتدادين <code>.tar.gz</code> أو <code>.tgz</code> لملفات الـ tar المضغوطة.</p>
+       </div>
+       <div class="nav-controls">
+           <button class="nav-btn" onclick="prevSlide()">→ السابق</button>
+           <button class="nav-btn" onclick="nextSlide()">التالي ←</button>
+       </div>
+   </div>
+
+   <!-- الشريحة 8: مثال إنشاء أرشيف لعدة ملفات -->
+   <div class="slide" id="slide-8">
+       <div class="slide-header">
+           <h2>مثال لإنشاء أرشيف لعدة ملفات (باسم مغاير)</h2>
+           <span class="slide-number">08 / 12</span>
+       </div>
+       <div class="slide-body">
+           <div class="terminal-window">
+               <div class="terminal-header"><div class="t-dot" style="background:#ef4444;"></div><div class="t-dot" style="background:#f59e0b;"></div><div class="t-dot" style="background:#22c55e;"></div></div>
+               <div class="terminal-body">
+                   <span class="t-prompt">sh@ubuntu:~$</span> <span class="t-cmd">tar -cf Books.tar Book</span><br>
+                   <span class="t-prompt">sh@ubuntu:~$</span> <span class="t-cmd">ls -l Books.tar</span><br>
+                   <span class="t-output">-rw-rw-r-- 1 admin admin 542720 Oct 12 21:42 Books.tar</span>
+               </div>
+           </div>
+           <p style="font-size: 1.1rem; margin-top: 8px;">• <strong>الأول -c:</strong> يحدد أسلوب الأرشفة (إنشاء أرشيف باسم <code>Books.tar</code>).</p>
+           <p style="font-size: 1.1rem;">• <strong>الثاني -f:</strong> يخبر الـ tar أن المدخل التالي هو اسم ملف الأرشيف.</p>
+           <p style="font-size: 1.1rem;">• ينتج عن ذلك ملف أرشيف ذو حجم كبير نسبياً، لذلك إما نقوم بضغطه لاحقاً أو استخدام الخيار <code>z</code> مع الأمر tar.</p>
+       </div>
+       <div class="nav-controls">
+           <button class="nav-btn" onclick="prevSlide()">→ السابق</button>
+           <button class="nav-btn" onclick="nextSlide()">التالي ←</button>
+       </div>
+   </div>
+
+   <!-- الشريحة 9: ضغط الأرشيف واستعراضه واستخراجه -->
+   <div class="slide" id="slide-9">
+       <div class="slide-header">
+           <h2>ضغط الأرشيف، استعراضه، واستخراجه</h2>
+           <span class="slide-number">09 / 12</span>
+       </div>
+       <div class="slide-body">
+           <div class="terminal-window">
+               <div class="terminal-header"><div class="t-dot" style="background:#ef4444;"></div><div class="t-dot" style="background:#f59e0b;"></div><div class="t-dot" style="background:#22c55e;"></div></div>
+               <div class="terminal-body" style="font-size: 0.95rem;">
+                   <span class="t-prompt">sh@ubuntu:~$</span> <span class="t-cmd">tar -czf Books.tar.gz Book</span> <span style="color:#94a3b8"># أرشفة وضغط مباشر</span><br>
+                   <span class="t-prompt">sh@ubuntu:~$</span> <span class="t-cmd">tar -tf Books.tar</span> <span style="color:#94a3b8"># استعراض المحتويات بدون فك</span><br>
+                   <span class="t-output">Book3<br>Book1<br>Book4<br>Book<br>Book2</span><br>
+                   <span class="t-prompt">sh@ubuntu:~$</span> <span class="t-cmd">tar -xf Books.tar</span> <span style="color:#94a3b8"># استخراج جميع المحتويات (يبقى ملف tar الأصلي ثابتاً)</span>
+               </div>
+           </div>
+           <p style="font-size: 1.05rem; margin-top: 5px;">• يمكن استخدام <code>bzip2</code> بدلاً من <code>gzip</code> باستبدال الحرف <code>z</code> بالحرف <code>j</code> لتصبح الامتدات مثل <code>.tar.bz2</code>.</p>
+       </div>
+       <div class="nav-controls">
+           <button class="nav-btn" onclick="prevSlide()">→ السابق</button>
+           <button class="nav-btn" onclick="nextSlide()">التالي ←</button>
+       </div>
+   </div>
+
+   <!-- الشريحة 10: الصلاحيات وموقع root و group -->
+   <div class="slide" id="slide-10">
+       <div class="slide-header">
+           <h2>الصلاحيات (Permissions) وموقع المالكين في التيرمينال</h2>
+           <span class="slide-number">10 / 12</span>
+       </div>
+       <div class="slide-body">
+           <p>عند تنفيذ الأمر <code>ls -l</code> تظهر تفاصيل الصلاحيات والمالكين بدقة:</p>
+
+           <div class="terminal-window" style="margin: 8px 0;">
+               <div class="terminal-header"><div class="t-dot" style="background:#ef4444;"></div><div class="t-dot" style="background:#f59e0b;"></div><div class="t-dot" style="background:#22c55e;"></div></div>
+               <div class="terminal-body" style="font-size: 1rem;">
+                   <span class="t-prompt">$</span> <span class="t-cmd">ls -l Books.tar.gz</span><br>
+                   <span class="t-output"><span style="color:#f43f5e; font-weight:bold;">-</span><span style="color:#38bdf8; font-weight:bold;">rwx</span><span style="color:#4ade80; font-weight:bold;">r-x</span><span style="color:#c084fc; font-weight:bold;">r--</span>  1  <span style="color:#f59e0b; font-weight:bold;">root</span>  <span style="color:#38bdf8; font-weight:bold;">admin_group</span>  4096 Oct 19 Books.tar.gz</span>
+               </div>
+           </div>
+
+           <div style="background: #e2e8f0; padding: 12px; border-radius: 10px; font-size: 1.05rem;">
+               <p><strong>تفسير تفصيلي:</strong></p>
+               <ul style="margin-top: 4px;">
+                   <li><code style="color:#f59e0b;">root (المالك الرئيسي / Owner):</code> يمتلك الصلاحيات المطلقة على الملف (قراءة، كتابة، تنفيذ <code>rwx</code>).</li>
+                   <li><code style="color:#38bdf8;">admin_group (المجموعة / Group):</code> مجموعة المستخدمين التابعين للملف ولهم صلاحيات محددة.</li>
+                   <li><strong>دور tar:</strong> عند الأرشفة، تحرص أداة <code>tar</code> على حفظ هؤلاء المالكين والصلاحيات كي لا تضيع عند النقل.</li>
+               </ul>
+           </div>
+       </div>
+       <div class="nav-controls">
+           <button class="nav-btn" onclick="prevSlide()">→ السابق</button>
+           <button class="nav-btn" onclick="nextSlide()">التالي ←</button>
+       </div>
+   </div>
+
+   <!-- الشريحة 11: أسئلة التحدي والمراجعة -->
+   <div class="slide" id="slide-11">
+       <div class="slide-header">
+           <h2>أسئلة التحدي والمراجعة</h2>
+           <span class="slide-number">11 / 12</span>
+       </div>
+       <div class="slide-body">
+           <div class="quiz-box">
+               <p style="font-weight: bold; color: var(--dark-blue); font-size: 1.1rem;">
+                   1. ما هو الأمر الصحيح لعرض تفاصيل ملف مضغوط باستخدام gzip؟
+               </p>
+               <div class="quiz-options">
+                   <button onclick="checkAnswer(1, this, 'fb1')">أ) gzip -d file.gz</button>
+                   <button onclick="checkAnswer(2, this, 'fb1')">ب) gzip -l file.gz</button>
+                   <button onclick="checkAnswer(3, this, 'fb1')">ج) tar -tf file.tar</button>
+               </div>
+               <div id="fb1" style="margin-top: 6px; font-weight: bold;"></div>
+           </div>
+
+           <div class="quiz-box" style="margin-top: 10px;">
+               <p style="font-weight: bold; color: var(--dark-blue); font-size: 1.1rem;">
+                   2. أي من الخوارزميات التالية يمنح نسبة ضغط أعلى وملفات أصغر حجماً بوضوح؟
+               </p>
+               <div class="quiz-options">
+                   <button onclick="checkAnswer2(1, this, 'fb2')">أ) gzip</button>
+                   <button onclick="checkAnswer2(2, this, 'fb2')">ب) bzip2</button>
+                   <button onclick="checkAnswer2(3, this, 'fb2')">ج) tar العادي</button>
+               </div>
+               <div id="fb2" style="margin-top: 6px; font-weight: bold;"></div>
+           </div>
+       </div>
+       <div class="nav-controls">
+           <button class="nav-btn" onclick="prevSlide()">→ السابق</button>
+           <button class="nav-btn" onclick="nextSlide()">التالي ←</button>
+       </div>
+   </div>
+
+   <!-- الشريحة 12: الخلاصة وخاتمة الدرس -->
+   <div class="slide" id="slide-12">
+       <div class="slide-header">
+           <h2>الخلاصة والتطبيقات العملية في سيسكو</h2>
+           <span class="slide-number">12 / 12</span>
+       </div>
+       <div class="slide-body">
+           <p style="font-weight: bold; margin-bottom: 10px;">أهم المهارات المكتسبة اليوم لبيئة العمل:</p>
+           <ul style="line-height: 1.8; font-size: 1.15rem;">
+               <li><strong>الاحتراف في سطر الأوامر:</strong> تنفيذ أوامر <code>tar</code>, <code>gzip</code>, <code>bzip2</code> بكل إتقان.</li>
+               <li><strong>حفظ الصلاحيات والمالكين:</strong> ضمان بقاء حقوق <code>root</code> والمجموعات سليمة داخل الأرشيف.</li>
+               <li><strong>النسخ الاحتياطي الفعال:</strong> إدارة مساحات الخوادم وسجلات الأنظمة بكفاءة عالية.</li>
+           </ul>
+           <div style="text-align: center; margin-top: 20px; background: #dcfce7; color: var(--accent-green); padding: 15px; border-radius: 12px; font-weight: 900; font-size: 1.25rem; border: 2px solid #86efac;">
+               شكراً لحسن تفاعلكم، وبالتوفيق في التطبيق العملي ونظم التشغيل! 🚀
+           </div>
+       </div>
+       <div class="nav-controls">
+           <button class="nav-btn" onclick="prevSlide()">→ السابق</button>
+           <span></span>
+       </div>
+   </div>
+
+</div>
+
+<script>
+   let currentSlide = 1;
+   const totalSlides = 12;
+
+   function showSlide(n) {
+       document.querySelectorAll('.slide').forEach(slide => slide.classList.remove('active'));
+       if (n > totalSlides) currentSlide = totalSlides;
+       if (n < 1) currentSlide = 1;
+       document.getElementById(`slide-${currentSlide}`).classList.add('active');
+   }
+
+   function nextSlide() {
+       currentSlide++;
+       showSlide(currentSlide);
+   }
+
+   function prevSlide() {
+       currentSlide--;
+       showSlide(currentSlide);
+   }
+
+   function checkAnswer(opt, btn, fbId) {
+       const fb = document.getElementById(fbId);
+       if (opt === 2) {
+           fb.style.color = "var(--accent-green)";
+           fb.innerHTML = "🎉 صحيح تماماً! مفتاح `-l` (List) يعرض تفاصيل الملف المضغوط.";
+       } else {
+           fb.style.color = "#dc2626";
+           fb.innerHTML = "❌ إجابة خاطئة، مفتاح التفاصيل في gzip هو `-l`.";
+       }
+   }
+
+   function checkAnswer2(opt, btn, fbId) {
+       const fb = document.getElementById(fbId);
+       if (opt === 2) {
+           fb.style.color = "var(--accent-green)";
+           fb.innerHTML = "🎉 ممتاز! bzip2 يعطي نسبة ضغط أعلى وملفات أصغر.";
+       } else {
+           fb.style.color = "#dc2626";
+           fb.innerHTML = "❌ إجابة خاطئة، الأداة التي تعطي أعلى ضغط هي bzip2.";
+       }
+   }
+</script>
+
+</body>
+</html>
